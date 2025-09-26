@@ -1,0 +1,205 @@
+What is ls?
+The first command we learn is ls. This is the list command. It allows us... list the content of the directory. ls is the command we can encounter in all Linux and Unix systems. We can see it as one of the 'core' commands in the system.
+
+Ok, let's play with it a little.
+
+Run ls
+
+What we see on the screen is a list of the content of the current directory.
+
+What is visible immediately, that we have different colors. We can imagine what it means, but let's forget it for a second. What many waves of "classic" sys admins saw in their days:
+
+ls --color=no
+
+So, this leads us to the first output, the colorized list of content. In order to have it, we need to run
+
+ls --color=yes
+
+or, alternatively for now
+
+ls --color=auto .
+
+For now, it will be enough to say, this colorized option is added as default in one place in the system, we will go there in one of the future lessons.
+
+Ok, let's finally learn more about ls. The command has multiple arguments we can add in order to change the output of the command.
+
+Now, important to understand. What we pass after the command - these are arguments. Not switches, parameters, etc. We can hear these names, but to learn how to work with Linux properly, we should name the elements with proper convention.
+
+So, our first argument will give us more details. Please execute
+
+ls -l .
+
+- indicates that we will pass arguments. We have two ways here
+
+- one dash informs the system that we will pass one letter argument, like 'l'
+-- two dashes means that argument will contain more than one letter. Most commonly it will be an English word.
+
+How to get more details
+All right. We know ho to get list of items from directory.
+
+But this is less than informant. Yes, we have a view. But without details.
+
+Before we learn how to get more details, there is a command we will run now, to clear the screen.
+
+clear
+
+What does it do? Well, it clears the screen. How it works, doesn't matter for us, really.
+
+The same you can achieve by running /bin/echo -e "\x1b\x5b\x48\x1b\x5b\x32\x4a\c" , but we can agree, that 'clear' is easier to remember!
+Ok, let's finally learn more about ls. The command has multiple arguments we can add in order to change the output of the command.
+
+Now, important to understand. What we pass after the command - these are arguments. Not switches, parameters, etc. We can hear these names, but to learn how to work with Linux properly, we should name the elements with proper convention.
+
+So, our first argument will give us more details. Please execute
+
+ls -l .
+
+- indicates that we will pass arguments. We have two ways here
+
+- one dash informs the system that we will pass one letter argument, like 'l'
+-- two dashes means that argument will contain more than one letter. Most commonly it will be an English word.
+l means long listing format.
+
+What we have here?
+
+The format contains a few columns. Let's try to understand them:
+
+permissions. Here we can see what kind of permission has the object. We will work with permissions... soon :)
+number of hard links. By default every object has 1 hard link. What are links? We will learn it in 18th lesson.
+Owner. The owner of the object. It doesn't mean who created it, but who owns it at this moment.
+Group. Owner belongs to the group (of users). This information is here too. This means that our 'groupmates' have specific access to the file.
+Size. File size in bytes.
+date and time of last modification of the object.
+file name.
+Owner and group. For now it will be enough to know that we see on the listing above the names of the users and groups. The system keeps and translates them from numerical representation. These are UID for user identifier and GID for group identifier. We can list this information in numeric way, by entering the
+
+ls -n command. This works like ls -l, but it changes the user-friendly names to UIDs and GIDs.
+
+Right now we listed all files in alphabetical order.
+But... All files?
+
+List all files
+Maybe some of you know, but there are many files and directories which are hidden. This generally means that these object are not listed by using standard listing commands (or by standard view in GUI). In Linux these files and directories are present too. There are a lot already in your directory.
+
+Linux uses . on the beginning of the object's name. We call these files the dotfiles. Ok, let's print the files again.
+
+ls
+
+Hm, there are no 'hidden' files.
+
+Yes, we have to find a proper argument. this time it will be -a.
+
+ls -a
+
+This command listed much more files than before. A lot of dotfiles! No matter what are they, at least, not now. But two of them needs to be explained.
+
+.
+..
+The first, . simply means the current directory of the user.
+
+The second, .. means parent directory.
+
+Simple like that :)
+
+So... Let's try something.
+
+ls .
+
+will show exactly the same output like simple ls. And
+
+ls .. shows... yes, the parent directory structure!
+
+Final argument for this section is -A (capital a). While a means all, A means almost all. In this case the command will show all files, except the . and ...
+
+Let's try: ls -A .
+
+Ok, last thing for now. We can combine multiple arguments in the command. Try run
+
+ls -al . What can you see?
+
+Sorting
+Obviously, all lists can be sorted. There is no exception here.
+
+Linux allows us to list files using multiple sorting options. ls command has some options built-in. First type of sort we already observed. By default ls sorts the files alphabetically. Let's try something else.
+
+Before we start, though, there is one concept we need to go through. Linux has differente timestamps, three, to be exact.
+
+atime - the last time when file was accessed
+mtime - last modification time. By modification we mean change in the file content.
+ctime - last metadata modification time. We mean here - permissions change, location of the file, etc.
+It is imperative for you to understand it.
+
+What is timestamp?
+
+This is the numerical representation of the time. It is the number of seconds passed from Unix epoch which is midnight of 1st of January, 1970.
+
+Example how it looks is visible below
+
+$ date +%s
+1635797690
+$ date
+Mon 01 Nov 2021 08:14:52 PM UTC
+Well, on the occasion we learned a new command - date. Enough to say, this command shows the current date and time:
+
+date .
+
+The first sort option will be -t. This argument sorts files with the last modification time, newest files come first.
+
+Let's try.
+
+ls -lt
+
+We use two arguments, to observe things better. We can specify exactly the modification time by adding u to the argument list. But please remember, in order to print this information properly you have to use t with another argument (u in this case).
+
+ls -ltu
+
+Ok, now let's print the list and order it by ctime - metadata change.
+
+ls -ltc
+
+Well, not much changed, right? Please execute these commands and carefully observe the output
+
+touch theNewestFile (this creates a new file)
+ls -ltu
+ls -ltc
+echo "hello world!" > file-02 (this will add something to the file)
+ls -ltu
+ls -ltc
+chmod 444 file-01 (this will change the permissions of the file)
+ls -ltu
+ls -ltc
+
+Please spend some time to understand what and how was printed. We used some commands which are new, but do not waste your time on them now.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

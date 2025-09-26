@@ -1,0 +1,30 @@
+HW WK3: GitBash
+LINUX COMMANDS:
+pwd = print working directory
+ls = list files and folders inside the current directory
+cd = change directory
+clear = clears screen
+cd .. = go back one directory
+mkdir = make directory
+touch = makes a new directory
+rm = deletes file (never use in the root directory!)
+
+NOTES WK3: GitBash
+----
+#first time running github in new project
+git init
+
+# adding files 
+# note can use: "git add ." in order to add all file
+git add <files>
+git status
+git commit -m "<VIP: notes of files being committed and changes being made>"
+git branch -M <name branch using first letter last name>
+git remote add origin <repo name>
+git status
+
+#if repo is incorrect or get a repo error
+git remote set-url origin https://github.com/jastek69/gcp_terraform_bhoejm_dev.git
+git push -u origin <branch name from above>
+
+
