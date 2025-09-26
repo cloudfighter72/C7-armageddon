@@ -112,13 +112,13 @@ CREATE NEW REPO ON THE COMMAND LINE
 echo "# cloudfighter72" >> README.md
 git init
 git add README.nmd
-got commit -m "first commit"
+git commit -m "first commit"
 git branch -M main
-git remote add origin https://github.com/cloudfighter72/Class7HW
+git remote add origin https://github.com/cloudfighter72/wolfpackHW.git
 git push -u origin main
 
 PUSH AN EXISTING REPO FROM COMMAND LINE
 
-git remote add origin https://github.com/cloudfighter72/Class7HW
+git remote add origin https://github.com/cloudfighter72/wolfpackHW.git
 git branch -M main
 git push -u origin main
