@@ -1,0 +1,22 @@
+{
+  "gate": "secrets_and_role",
+  "timestamp_utc": "2026-03-15T23:05:34Z",
+  "region": "us-east-2",
+  "instance_id": "i-0a5d350d674378a71",
+  "secret_id": "arn:aws:secretsmanager:us-east-2:185196963048:secret:lab_1c/rds/db_secrets07-bF0DYv",
+  "resolved_instance_profile_arn": "arn:aws:iam::185196963048:instance-profile/lab_1c-instance-profile01",
+  "resolved_role_name": "lab_1c-ec2-secrets-role",
+  "caller_arn": "arn:aws:iam::185196963048:user/AWSCLI",
+  "toggles": {
+    "require_rotation": false,
+    "check_secret_policy_wildcard": true,
+    "check_secret_value_read": false
+  },
+  "status": "PASS",
+  "exit_code": 0,
+  "details": [
+"PASS: aws sts get-caller-identity succeeded (credentials OK).\nPASS: secret exists and is describable (arn:aws:secretsmanager:us-east-2:185196963048:secret:lab_1c/rds/db_secrets07-bF0DYv).\nINFO: rotation requirement disabled (REQUIRE_ROTATION=false).\nPASS: no resource policy found (OK) or not applicable (arn:aws:secretsmanager:us-east-2:185196963048:secret:lab_1c/rds/db_secrets07-bF0DYv).\nPASS: instance has IAM instance profile attached (i-0a5d350d674378a71).\nPASS: resolved instance profile -> role (lab_1c-instance-profile01 -> lab_1c-ec2-secrets-role).\nINFO: EXPECTED_ROLE_NAME not set; using resolved role (lab_1c-ec2-secrets-role).\nINFO: on-instance checks skipped (not running as expected role on EC2)."],
+  "warnings": [
+"WARN: current caller ARN is not assumed-role/lab_1c-ec2-secrets-role (you may be running off-instance)."],
+  "failures": []
+}

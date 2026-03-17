@@ -11,9 +11,9 @@ set -euo pipefail
 
 # ---------- Inputs (override via env) ----------
 REGION="${REGION:-us-east-2}"
-INSTANCE_ID="${INSTANCE_ID:-i-0dd6447b2f3ab96b8}"
-SECRET_ID="${SECRET_ID:-arn:aws:secretsmanager:us-east-2:185196963048:secret:db-secret-MKWYB6}"
-DB_ID="${DB_ID:-armageddon-db}"
+INSTANCE_ID="${INSTANCE_ID:-i-0a5d350d674378a71}"
+SECRET_ID="${SECRET_ID:-arn:aws:secretsmanager:us-east-2:185196963048:secret:lab_1c/rds/db_secrets07-bF0DYv}"
+DB_ID="${DB_ID:-lab-1c-mysql}"
 
 # toggles pass-through
 REQUIRE_ROTATION="${REQUIRE_ROTATION:-false}"

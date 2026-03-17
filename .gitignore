@@ -43,7 +43,7 @@ override.tf.json
 terraform.rc
 
 # Ignore keys
-*.json 
+# *.json 
 *.pem
 *.key
 *.p12
