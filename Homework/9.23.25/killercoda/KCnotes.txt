@@ -1,0 +1,17 @@
+1. create a text document file for each lesson (i.e. lesson1.txt) using touch
+2. '''plaintext
+touch lesson.txt
+
+2. update your Lesson.txt file using "vim" to modify it as it is in use.
+'''sh
+vim lesson.txt
+
+press the "i" key on your keyboard to change from view mode to insert mode.
+press the Esc button on your keyboard and type the command :wq
+this will allow you to save and close your vim command
+
+ls -l >> lesson.txt
+cat lesson1.txt = the view the result 
+
+
+touch lesson1.txt

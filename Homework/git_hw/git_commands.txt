@@ -1,0 +1,103 @@
+Week 1 Homework: Add First Branch of your Repo
+================================
+git init 										# Initialize Git Command and create that .git folder
+git add .										# Add all your files in that folder to Git
+git commit -m "first commit"								# Commit all your files to be pushed to GitHub
+git branch -M week-1-homework								# Push to whatever branch you select
+git remote add origin https://github.com/tiqsclass6/github-branch-demo.git		# Sets your GitHub repository URL
+git push -u origin week-1-homework							# Pushes your files from your computer to GitHub
+
+
+Week 2 Homework: Add Additional Branches to your Repo
+====================================
+git init 										# Initialize Git Command and create that .git folder
+git add .										# Add all your files in that folder to Git
+git commit -m "first commit"								# Commit all your files to be pushed to GitHub
+git branch -M week-2-homework								# Push to whatever branch you select
+git remote add origin https://github.com/tiqsclass6/github-branch-demo.git		# Sets your GitHub repository URL
+git push -u origin week-2-homework							# Pushes your files from your computer to GitHub
+
+Week 3 Homework
+================
+git init 										# Initialize Git Command and create that .git folder
+git add .										# Add all your files in that folder to Git
+git commit -m "first commit"								# Commit all your files to be pushed to GitHub
+git branch -M week-3-homework								# Push to whatever branch you select
+git remote add origin https://github.com/tiqsclass6/github-branch-demo.git		# Sets your GitHub repository URL
+git push -u origin week-3-homework							# Pushes your files from your computer to GitHub
+
+Week 4 Homework
+================
+git init 										# Initialize Git Command and create that .git folder
+git add .										# Add all your files in that folder to Git
+git commit -m "first commit"								# Commit all your files to be pushed to GitHub
+git branch -M week-4-homework								# Push to whatever branch you select
+git remote add origin https://github.com/tiqsclass6/github-branch-demo.git		# Sets your GitHub repository URL
+git push -u origin week-4-homework							# Pushes your files from your computer to GitHub
+
+Week 6 Homework
+================
+git init 										# Initialize Git Command and create that .git folder
+git add .										# Add all your files in that folder to Git
+git commit -m "first commit"								# Commit all your files to be pushed to GitHub
+git branch -M week-6-homework								# Push to whatever branch you select
+git remote add origin https://github.com/tiqsclass6/github-branch-demo.git		# Sets your GitHub repository URL
+git push -u origin week-6-homework							# Pushes your files from your computer to GitHub
+
+remove one file from stage: git rm --cached <file name>
+remove multiple files from stage: git rm --cached -r .
+to see your commit: git log
+
+to see what is in the file: cat <file name>
+To reset the file to the state from previous commit:
+cat <file name>
+git checkout <file name>
+cat <file name>
+git status
+
+remove all changes in one short command:
+git checkout .
+git status
+All changes are reverted and our directory in consistent with previous commit.
+
+reset the HEAD to the state before committing the last file: git reset --soft HEAD~1
+
+
+to check diff for one file: clear && git diff HEAD~1 <file name>
+git diff: checks the differences between HEAD and current working directory, i.e.: what was changed during our recent work.
+git diff --staged: shows any difference in files that are staged
+git show: information similar to git log
+quit git log: q
+
+git tag: checks for any tags
+git tag -a v1.0 -m "version 1.0. initial state": tag will read "version 1.0 initial state"
+git show <tag name>: shows what is inside the file
+good practice is to use v and number which describes the changes from previous tag
+
+git checkout: moves between branches. add -b creates a new branch
+git branch -r: lists branches from remote
+
+switch to master and merge changes: 
+git checkout master
+git merge <branch name> --no-edit
+clear && git adog
+And this is the final state. Merge created a new commit to reflect changes caused by the process.
+As we finished work on branch, we can delete it: git branch -d <branch name> && git branch
+
+
+
+git init
+git add .
+git commit -m "first commit"
+git branch -M main
+git remote add origin 
+git push -u origin <webpage>
+
+
+
+
+
+
+
+
+

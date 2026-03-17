@@ -27,4 +27,4 @@ git status
 git remote set-url origin https://github.com/jastek69/gcp_terraform_bhoejm_dev.git
 git push -u origin <branch name from above>
 
-
+when creating a new repo add .gitignore file
