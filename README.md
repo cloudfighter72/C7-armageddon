@@ -1,179 +1,129 @@
-# Lab 1c — RDS Credential Drift Detection & Remediation
+# EC2 to RDS Integration Lab
 
-## PART I — Application Endpoints (Test from your local machine/browser)
+An EC2 app host in a public subnet talking to a private RDS MySQL
+instance. Credentials come from Secrets Manager via an IAM instance
+role, and the database accepts traffic only from the app host's security
+group.
 
-### Replace <PUBLIC_IP> with your actual EC2 public IP
+## File layout
 
-```plaintext
-http://56.125.168.137/init
-http://56.125.168.137/add?note=first_note
-http://56.125.168.137/add?note=blue_book_gentlemen
-http://56.125.168.137/add?note=brazil_colombia_capeverde
-http://56.125.168.137/add?note=this_is_200k_work
-http://56.125.168.137/add?note=lab_1b_is_a_success
-http://56.125.168.137/list
-```
+Files are numbered in apply and read order. Cross-cutting concerns use a
+word prefix, and outputs sort last.
 
----
+- `00-versions.tf` — Terraform and provider constraints, S3 backend
+- `01-providers.tf` — AWS provider
+- `02-variables.tf` — input variables
+- `03-data.tf` — AMI lookup, AZ lookup, locals
+- `04-vpc.tf` — VPC, subnets, IGW, route tables
+- `05-rds.tf` — DB subnet group and MySQL instance
+- `06-secrets.tf` — generated password and Secrets Manager entry
+- `07-ec2.tf` — app host
+- `iam_ec2.tf` — instance role, scoped policy, instance profile
+- `sg_ec2.tf` — app host security group
+- `sg_rds.tf` — database security group
+- `A-outputs.tf` — outputs, including copy-paste verification commands
+- `terraform.tfvars` — tunable values, no credentials
+- `user_data.sh` — cloud-init template rendered by `templatefile()`
 
-## PART II — Configuration Validation (run on EC2 instance)
+## Deliverable mapping
 
-### 2.1 Retrieve database connection parameters from Parameter Store
+Which file satisfies which item in section 5 of the lab document.
 
-```bash
-aws ssm get-parameters \
-  --names "/lab/db/endpoint" "/lab/db/port" "/lab/db/name" \
-  --with-decryption \
-  --region us-east-2 \
-  --output table
-```
+- A.1 EC2 running and reachable over HTTP — `07-ec2.tf`, `sg_ec2.tf`
+- A.2 RDS MySQL in the same VPC — `05-rds.tf`, `04-vpc.tf`
+- A.3 RDS inbound 3306 from the EC2 security group — `sg_rds.tf`
+- A.4 IAM role allowing Secrets Manager access — `iam_ec2.tf`
+- B.1 to B.3 init, insert, read — `user_data.sh`
+- C.1 CLI evidence — the `verify_commands` output
+- C.2 Browser evidence — the `application_urls` output
 
-### 2.2 Retrieve full database credentials from Secrets Manager (clean JSON output)
+## Prerequisites
 
-```bash
-aws secretsmanager get-secret-value \
-  --secret-id "lab/rds/mysql_v17" \
-  --region us-east-2 \
-  --query SecretString \
-  --output json | jq .
-  ```
+- Terraform 1.11 or later, for native S3 state locking
+- AWS credentials for the account holding `armageddon-bucket1`
+- An existing EC2 key pair named in `aws_key_pair_name`, or set it to
+  `null` and use SSM Session Manager instead
 
----
-
-## PART III — Monitoring & Alerting (SNS + CloudWatch)
-
-### 3.1 Subscribe email to SNS topic (only needed once)
-
-```bash
-aws sns subscribe \
-  --topic-arn arn:aws:sns:us-east-2:185196963048:lab-1c-db-incidents-v1 \
-  --protocol email \
-  --notification-endpoint bjett2000@hotmail.com \
-  --region us-east-2
-```
-
-### 3.2 Verify subscription status (after confirming email link)
+## Usage
 
 ```bash
-aws sns list-subscriptions-by-topic \
-  --topic-arn arn:aws:sns:us-east-2:185196963048:lab-1c-db-incidents-v1 \
-  --region us-east-2 \
-  --query "Subscriptions[?Protocol=='email'].{Endpoint:Endpoint, Status:Status}" \
-  --output table
+terraform init
+terraform fmt -check
+terraform validate
+terraform plan -out=tfplan
+terraform apply tfplan
 ```
 
----
+RDS takes roughly 6 to 10 minutes to reach `available`. The app retries
+its secret lookup for about two minutes after boot, so give the instance
+a moment before hitting `/health`.
 
-## PART IV - Simulate the Incident (Trigger the Alarm)
-
-Purpose: Force a connection failure to generate logs, increment the metric, and trigger the alarm.
-Step 4.1 — Change the RDS password (most reliable way to trigger credential failure)
-
-Go to AWS Console → RDS → select your instance (lab-1c-mysql)
-Actions → Modify
-Under "Settings" → change the Master password to something different from what's in Secrets Manager
-Apply immediately (no maintenance window needed)
-
-```plaintext
-http://56.125.168.137/init
-http://56.125.168.137/add?note=test-failure
-http://56.125.168.137/list
-```
-
----
-
-## PART V — Incident Runbook (execute in exact order)
-
-### 5.1 Acknowledge – Check current alarm state
+Then print the checks with real IDs filled in:
 
 ```bash
-aws cloudwatch describe-alarms \
-  --alarm-names lab-1c-db-connection-failure \
-  --region us-east-2 \
-  --query "MetricAlarms[].StateValue" \
-  --output text
+terraform output -raw verify_commands
+terraform output -raw application_urls
 ```
 
-### 5.2 Observe – Check recent error logs (last 1 hour)
+## Notes on the lab's CLI commands
+
+Two commands in section 6 need adjusting for this build.
+
+Section 6.5 uses `--group-names sg-rds-lab`. That flag only resolves
+security groups in a default VPC. In a custom VPC, use the ID:
 
 ```bash
-aws logs filter-log-events \
-  --log-group-name "/aws/ec2/lab-1c-rds-app" \
-  --filter-pattern '"Access denied for user"' \
-  --region us-east-2 \
-  --start-time "$(date -d '-1 hour' +%s000)" \
-  --limit 10 \
-  --output json \
-| jq -r '.events[] | [(.timestamp / 1000 | todate), .message] | @tsv' \
-| sort -n
+aws ec2 describe-security-groups \
+  --group-ids "$(terraform output -raw rds_security_group_id)" \
+  --query "SecurityGroups[].IpPermissions"
 ```
 
-### 5.3 Validate Configuration Sources (repeat from Part II if needed)
+You should see `FromPort` 3306 with a `UserIdGroupPairs` entry holding
+the EC2 security group ID, and an empty `IpRanges` list. A CIDR there
+instead would fail the deliverable.
+
+Section 6.7 says `sudo dnf install -y mysql`. On Amazon Linux 2023 the
+package is `mariadb105`, and `user_data.sh` already installs it. To
+connect, get the password from the secret:
 
 ```bash
-aws ssm get-parameters \
-  --names "/lab/db/endpoint" "/lab/db/port" "/lab/db/name" \
-  --with-decryption \
-  --region us-east-2 \
-  --output table
-
-aws secretsmanager get-secret-value \
-  --secret-id "lab/rds/mysql_v17" \
-  --region us-east-2 \
-  --query SecretString \
-  --output json | jq .
+mysql -h "$(terraform output -raw rds_endpoint)" -u admin -p
 ```
 
-Notice the Password in the Secrets Manager was incorrect causing credential drift.
+## Credentials
 
-### 5.4 Recovery – Restore RDS password to match Secrets Manager
+The master password is generated by `random_password` and written to
+Secrets Manager, so nothing sensitive lives in `terraform.tfvars`. Read
+it with:
 
 ```bash
-# First Retrieve current password from Secrets Manager
-aws secretsmanager get-secret-value \
-  --secret-id "lab/rds/mysql_v17" \
-  --region us-east-2 \
-  --query SecretString \
-  --output text | jq -r .password
-
-# Then: Apply it to RDS (replace <PASTE_PASSWORD_HERE>)
-aws rds modify-db-instance \
-  --db-instance-identifier lab-1c-mysql \
-  --master-user-password "StFWydLMdmKvZEhb" \
-  --apply-immediately \
-  --region us-east-2
-
-# Monitor RDS status until 'available'
-aws rds describe-db-instances \
-  --db-instance-identifier lab-1c-mysql \
-  --region us-east-2 \
-  --query "DBInstances[].DBInstanceStatus" \
-  --output text
+terraform output -raw db_password
 ```
 
-### 5.5 Post-recovery verification
-
-```plaintext
-curl http://56.125.168.137/list
-```
-
-### 5.6 Confirm alarm clears (wait 5–10 minutes)
+Or from the instance, which is what section 6.6 is checking:
 
 ```bash
-aws cloudwatch describe-alarms \
-  --alarm-names lab-1c-db-connection-failure \
-  --region us-east-2 \
-  --query "MetricAlarms[].StateValue" \
-  --output text
+aws secretsmanager get-secret-value --secret-id lab/rds/mysql
 ```
 
-### 5.7 Confirm logs normalize (no new errors in last 5 minutes)
+State contains the password in cleartext, so keep the backend bucket
+encrypted, versioned, and private.
+
+## Cost notes
+
+There is no NAT gateway in this build. RDS never initiates outbound
+traffic, so the private subnets have no internet route at all. That
+removes the single largest hourly charge and makes the isolation
+structural rather than rule-based. The remaining cost is one t3.micro
+and one db.t3.micro.
+
+Run `terraform destroy` when you are finished.
+
+## Teardown
 
 ```bash
-aws logs filter-log-events \
-  --log-group-name "/aws/ec2/lab-1c-rds-app" \
-  --filter-pattern '"Access denied for user"' \
-  --region us-east-2 \
-  --start-time "$(date -d '-5 minutes' +%s000)" \
-  --output text
+terraform destroy
 ```
+
+`skip_final_snapshot` is true and the secret's recovery window is zero,
+so nothing is left behind that blocks a rebuild under the same names.

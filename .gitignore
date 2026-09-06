@@ -51,3 +51,4 @@ terraform.rc
 # Allow files to override negated patterns
 # Remove hash symbol to enable
 # !example.json
+*.pem
